@@ -1,0 +1,12 @@
+# git ignore
+
+olden/bh/src
+olden/bisort/src
+olden/em3d/src
+olden/health/src
+olden/mst/src
+olden/perimeter/src
+olden/power/src
+olden/treeadd/src
+olden/tsp/src
+olden/voronoi/src
