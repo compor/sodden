@@ -1,0 +1,3 @@
+[submodule "cmake/llvm-ir-cmake-utils"]
+	path = cmake/llvm-ir-cmake-utils
+	url = https://github.com/compor/llvm-ir-cmake-utils.git
