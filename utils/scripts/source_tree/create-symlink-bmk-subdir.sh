@@ -135,11 +135,6 @@ for BMK in "${BENCHMARKS[@]}"; do
   if [ "$BMK_RM_LINKS" -eq 0 ]; then
     # mode: create symlinks, if targets exist
 
-    if [[ ${BMK_SUBDIR} -eq "src" ]]; then
-      ln -sf ${BMK_SOURCE_DIR}/sys
-      ln -sf ${BMK_SOURCE_DIR}/common
-    fi
-
     for BMK_SUBDIR in "${BMK_SUBDIRS[@]}"; do
       # trim whitespace
       BMK_SUBDIR=$(echo $BMK_SUBDIR | xargs)
