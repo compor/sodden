@@ -11,9 +11,6 @@ INSTALL_PREFIX="$2"
 
 PIPELINE_CONFIG_FILE="${SRC_DIR}/config/pipelines/loopruntimeprofiler_loopdepth_with_al_slef.txt"
 BMK_CONFIG_FILE="${SRC_DIR}/config/suite_all.txt"
-BMK_CLASS="B"
-IS_BMK_CLASS="C"
-MG_BMK_CLASS="C"
 
 #
 
@@ -37,10 +34,6 @@ CC=clang CXX=clang++ \
   -DHARNESS_USE_LLVM=On \
   -DHARNESS_PIPELINE_CONFIG_FILE=${PIPELINE_CONFIG_FILE} \
   -DHARNESS_BMK_CONFIG_FILE=${BMK_CONFIG_FILE} \
-  -DHARNESS_BMK_CONFIG_FILE=${BMK_CONFIG_FILE} \
-  -DBMK_CLASS=${BMK_CLASS} \
-  -DIS_BMK_CLASS=${IS_BMK_CLASS} \
-  -DMG_BMK_CLASS=${MG_BMK_CLASS} \
   -DAnnotateLoops_DIR=${AnnotateLoops_DIR} \
   -DLoopRuntimeProfiler_DIR=${LoopRuntimeProfiler_DIR} \
   "${SRC_DIR}"
