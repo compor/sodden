@@ -3,8 +3,7 @@
 [[ -z $1 ]] && echo "error: source directory was not provided" && exit 1
 SRC_DIR=$1
 
-INSTALL_PREFIX="$2"
-[[ -z $2 ]] && INSTALL_PREFIX="${SRC_DIR}/../install/"
+INSTALL_PREFIX=${2:-../install/}
 
 [[ -z ${LLVMPOLLY_ROOT} ]] && echo "error: LLVMPOLLY_ROOT is not set" && exit 2
 
@@ -35,6 +34,4 @@ CC=clang CXX=clang++ \
   -DBMK_CLASS=${BMK_CLASS} \
   -DLLVMPOLLY_ROOT=${LLVMPOLLY_ROOT} \
   "${SRC_DIR}"
-
-exit $?
 

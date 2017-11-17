@@ -3,8 +3,7 @@
 [[ -z $1 ]] && echo "error: source directory was not provided" && exit 1
 SRC_DIR=$1
 
-INSTALL_PREFIX="$2"
-[[ -z $2 ]] && INSTALL_PREFIX="${SRC_DIR}/../install/"
+INSTALL_PREFIX=${2:-../install/}
 
 BMK_CONFIG_FILE="${SRC_DIR}/config/suite_all.txt"
 
@@ -44,6 +43,4 @@ cmake \
   -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}" \
   -DHARNESS_BMK_CONFIG_FILE=${BMK_CONFIG_FILE} \
   "${SRC_DIR}"
-
-exit $?
 

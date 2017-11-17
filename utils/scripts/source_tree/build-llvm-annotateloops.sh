@@ -3,8 +3,7 @@
 [[ -z $1 ]] && echo "error: source directory was not provided" && exit 1
 SRC_DIR=$1
 
-INSTALL_PREFIX="$2"
-[[ -z $2 ]] && INSTALL_PREFIX="${SRC_DIR}/../install/"
+INSTALL_PREFIX=${2:-../install/}
 
 [[ -z $AnnotateLoops_DIR ]] && echo "error: AnnotateLoops_DIR is not set" && exit 2
 
@@ -36,6 +35,4 @@ CC=clang CXX=clang++ \
   -DBMK_CLASS=${BMK_CLASS} \
   -DAnnotateLoops_DIR=${AnnotateLoops_DIR} \
   "${SRC_DIR}"
-
-exit $?
 
