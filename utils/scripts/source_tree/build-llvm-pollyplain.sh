@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-[[ -z $1 ]] && echo "error: source directory was not provided" && exit 1
-SRC_DIR=$1
-
+PRJ_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../" && pwd)"
+SRC_DIR=${1:-$PRJ_ROOT_DIR}
 INSTALL_PREFIX=${2:-../install/}
 
 [[ -z ${LLVMPOLLY_ROOT} ]] && echo "error: LLVMPOLLY_ROOT is not set" && exit 2
