@@ -1,4 +1,4 @@
-# nauseous
+# Sodden - An Olden benchmarks cmake harness
 
 ## Introduction
 
@@ -9,7 +9,7 @@ The actual source files for each benchmark are not included, but use [this][2] i
 
 ## Features
 
-- Building all 10 `C` benchmark programs
+- Building of all 10 `C` programs of the suite
 - Out-of-source builds thanks to [cmake][3]
 - Capability to create LLVM bitcode files thanks to [llvm-ir-cmake-utils][4] and LLVM `opt` pass pipelines (see the
   `config/pipelines` subdirectory).
