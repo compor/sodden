@@ -15,6 +15,7 @@ C_FLAGS="-g -Wall -O3"
 
 CC=gcc CXX=g++ \
 cmake \
+  -GNinja \
   -DCMAKE_POLICY_DEFAULT_CMP0056=NEW \
   -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
   -DCMAKE_BUILD_TYPE=Debug \

@@ -14,6 +14,7 @@ LINKER_FLAGS="${LINKER_FLAGS} -lc++ -lc++abi"
 
 CC=clang CXX=clang++ \
 cmake \
+  -GNinja \
   -DCMAKE_POLICY_DEFAULT_CMP0056=NEW \
   -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
   -DLLVM_DIR=$(llvm-config --prefix)/share/llvm/cmake/ \
