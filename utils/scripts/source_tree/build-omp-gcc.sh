@@ -8,9 +8,10 @@ BMK_CONFIG_FILE="${SRC_DIR}/config/suite_all.txt"
 
 #
 
-C_FLAGS="-g -Wall -O3 -fopenmp"
-#LINKER_FLAGS="-Wl,-L$(llvm-config --libdir) -Wl,-rpath=$(llvm-config --libdir)"
-#LINKER_FLAGS="${LINKER_FLAGS} -lc++ -lc++abi" 
+C_FLAGS="-g -Wall"
+C_FLAGS="${C_FLAGS} -O2"
+C_FLAGS="${C_FLAGS} -fopenmp"
+#LINKER_FLAGS="-lgomp" 
 
 CC=gcc CXX=g++ \
 cmake \
