@@ -32,9 +32,9 @@ The actual source files for each benchmark are not included, but use [this][2] i
 
    `create-symlink-bmk-subdir.sh -c suite_all.txt -s [path-to]/olden/ -t [path-to]/sodden/olden/ -l src`
 
-3. Create a directory for an out-of-source build.
-4. Run `cmake` and `cmake --build .` from the previously created build directory.
-   For examples on the various options have a look at the convenience build scripts located in the
+3. Create a directory for an out-of-source build and `cd` into it.
+4. Run `cmake` and `cmake --build .` with that appropriate options.
+   For examples on the various options have a look at the build scripts (provided for convenience) located in the
    `utils/scripts/source_tree` subdirectory.
 5. Optionally, you can install the benchmarks by
 
@@ -42,9 +42,19 @@ The actual source files for each benchmark are not included, but use [this][2] i
 
    Omitting `CMAKE_INSTALL_PREFIX` will use the `../install/` directory relative to the build directory.
 
+## Benchmark-specific configuration options
+
+TODO
+
+## How the harness works
+
+For a general description on how this harness operates please have a look [here][5].
+
+
 
 [1]: http://www.martincarlisle.com/olden.html
 [2]: https://github.com/compor/olden
 [3]: https://cmake.org
 [4]: https://github.com/compor/llvm-ir-cmake-utils
+[5]: doc/harness.md
 
