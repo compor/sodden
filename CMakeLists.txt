@@ -6,7 +6,6 @@ project(olden-1.0.0 C CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 include(Harness-Utils)
-include(Harness-Setparams)
 include(Harness-Version)
 include(InstallPipelineLLVMIR)
 
