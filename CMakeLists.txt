@@ -60,6 +60,8 @@ set(HARNESS_CONFIG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/config")
 
 add_definitions(-DTORONTO)
 
+include_directories(.)
+
 # project options checks and processing
 
 configure_file("${CMAKE_SOURCE_DIR}/scripts/preamble/preamble.sh.in"
