@@ -45,7 +45,14 @@ The actual source files for each benchmark are not included, but use [this][2] i
 
 ## Benchmark-specific configuration options
 
-TODO
+### Timing
+
+The harness defines a few macros, using the prefix `OLDEN_` in the `common/timing.h` header, that allow measuring the
+execution duration of sections of code. This facility seems to have been present, but was stripped away at some point. 
+Currently, these macros require a POSIX compliant system, so the specific detection is left to `cmake` with the use of
+the `common/config.h.cmake` generated header. On non-POSIX system the macros have dummy/empty alternatives.
+
+### more TODO
 
 
 ## How the harness works
