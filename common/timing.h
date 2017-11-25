@@ -19,5 +19,5 @@
 #define OLDEN_TIME(x)                                                          \
   do {                                                                         \
   } while (0)
-#define OLDEN_DURATION_MS(start, stop) 0
+#define OLDEN_DURATION_MS(start, stop) 0.0
 #endif
