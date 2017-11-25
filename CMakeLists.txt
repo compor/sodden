@@ -8,6 +8,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 include(Harness-Utils)
 include(Harness-Version)
 include(InstallPipelineLLVMIR)
+include(CheckIncludeFile)
 
 get_version(SODDEN_VERSION)
 message(STATUS "Nauseous harness version: ${SODDEN_VERSION}")
@@ -60,7 +61,12 @@ set(HARNESS_CONFIG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/config")
 
 add_definitions(-DTORONTO)
 
-include_directories(.)
+check_include_file(unistd.h HAVE_UNISTD_H)
+
+configure_file("common/config.h.cmake" "${CMAKE_BINARY_DIR}/common/config.h")
+configure_file("common/timing.h" "${CMAKE_BINARY_DIR}/common/timing.h")
+
+include_directories(${CMAKE_BINARY_DIR})
 
 # project options checks and processing
 
