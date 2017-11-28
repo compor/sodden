@@ -11,18 +11,29 @@ macro(LoopRuntimeProfilerLoopDepthPipelineSetup)
   message(STATUS "setting up pipeline ${PIPELINE_NAME}")
 
   if(NOT DEFINED ENV{HARNESS_INPUT_DIR})
-    message(FATAL_ERROR
-      "${PIPELINE_NAME} env variable HARNESS_INPUT_DIR is not defined")
+    message(WARNING
+      "${PIPELINE_NAME} env variable HARNESS_INPUT_DIR is not defined. \
+      Using ${CMAKE_BINARY_DIR}/inputs/")
+
+      set(ENV{HARNESS_INPUT_DIR} "${CMAKE_BINARY_DIR}/inputs/")
   endif()
 
   if(NOT DEFINED ENV{HARNESS_REPORT_DIR})
-    message(FATAL_ERROR
-      "${PIPELINE_NAME} env variable HARNESS_REPORT_DIR is not defined")
+    message(WARNING
+      "${PIPELINE_NAME} env variable HARNESS_REPORT_DIR is not defined. \
+      Using ${CMAKE_BINARY_DIR}/reports")
+
+      set(ENV{HARNESS_REPORT_DIR} "${CMAKE_BINARY_DIR}/reports/")
+  endif()
+
+  if(NOT DEFINED ENV{ANNOTATELOOPS_WHITELIST_FILE})
+    message(WARNING
+      "${PIPELINE_NAME} env variable ANNOTATELOOPS_WHITELIST_FILE is not defined")
   endif()
 
   file(TO_CMAKE_PATH $ENV{HARNESS_INPUT_DIR} HARNESS_INPUT_DIR)
-  if(NOT IS_DIRECTORY ${HARNESS_INPUT_DIR})
-    message(FATAL_ERROR "${PIPELINE_NAME} HARNESS_INPUT_DIR does not exist")
+  if(NOT EXISTS ${HARNESS_INPUT_DIR})
+    file(MAKE_DIRECTORY ${HARNESS_INPUT_DIR})
   endif()
 
   file(TO_CMAKE_PATH $ENV{HARNESS_REPORT_DIR} HARNESS_REPORT_DIR)
@@ -37,13 +48,7 @@ macro(LoopRuntimeProfilerLoopDepthPipelineSetup)
 
   #
 
-  find_package(LoopRuntimeProfiler CONFIG)
-
-  if(NOT LoopRuntimeProfiler_FOUND)
-    message(WARNING "package LoopRuntimeProfiler was not found; skipping.")
-
-    return()
-  endif()
+  find_package(LoopRuntimeProfiler CONFIG REQUIRED)
 
   get_target_property(LRP_LIB_LOCATION LLVMLoopRuntimeProfilerPass LOCATION)
 
@@ -127,8 +132,8 @@ function(LoopRuntimeProfilerLoopDepthPipeline trgt)
     DESTINATION ${DEST_DIR} OPTIONAL)
 
   set(BMK_BIN_NAME "${PIPELINE_PREFIX}_bc_exe")
-
-  set(BMK_BIN_PREAMBLE "\"\"")
+  set(BMK_BIN_PREAMBLE "")
+  set(PIPELINE_SCRIPT_PREFIX "${PIPELINE_NAME}")
 
   configure_file("scripts/_run.sh.in" "scripts/${PIPELINE_PREFIX}_run.sh" @ONLY)
 

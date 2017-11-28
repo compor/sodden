@@ -11,23 +11,29 @@ macro(AnnotateLoopsLEPipelineSetup)
   message(STATUS "setting up pipeline ${PIPELINE_NAME}")
 
   if(NOT DEFINED ENV{HARNESS_INPUT_DIR})
-    message(FATAL_ERROR
-      "${PIPELINE_NAME} env variable HARNESS_INPUT_DIR is not defined")
+    message(WARNING
+      "${PIPELINE_NAME} env variable HARNESS_INPUT_DIR is not defined. \
+      Using ${CMAKE_BINARY_DIR}/inputs/")
+
+      set(ENV{HARNESS_INPUT_DIR} "${CMAKE_BINARY_DIR}/inputs/")
   endif()
 
   if(NOT DEFINED ENV{HARNESS_REPORT_DIR})
-    message(FATAL_ERROR
-      "${PIPELINE_NAME} env variable HARNESS_REPORT_DIR is not defined")
+    message(WARNING
+      "${PIPELINE_NAME} env variable HARNESS_REPORT_DIR is not defined. \
+      Using ${CMAKE_BINARY_DIR}/reports")
+
+      set(ENV{HARNESS_REPORT_DIR} "${CMAKE_BINARY_DIR}/reports/")
   endif()
 
   if(NOT DEFINED ENV{ANNOTATELOOPS_WHITELIST_FILE})
-    message(FATAL_ERROR
+    message(WARNING
       "${PIPELINE_NAME} env variable ANNOTATELOOPS_WHITELIST_FILE is not defined")
   endif()
 
   file(TO_CMAKE_PATH $ENV{HARNESS_INPUT_DIR} HARNESS_INPUT_DIR)
-  if(NOT IS_DIRECTORY ${HARNESS_INPUT_DIR})
-    message(FATAL_ERROR "${PIPELINE_NAME} HARNESS_INPUT_DIR does not exist")
+  if(NOT EXISTS ${HARNESS_INPUT_DIR})
+    file(MAKE_DIRECTORY ${HARNESS_INPUT_DIR})
   endif()
 
   file(TO_CMAKE_PATH $ENV{HARNESS_REPORT_DIR} HARNESS_REPORT_DIR)
@@ -44,13 +50,12 @@ macro(AnnotateLoopsLEPipelineSetup)
 
   #
 
-  find_package(AnnotateLoops CONFIG)
-
-  if(NOT AnnotateLoops_FOUND)
-    message(FATAL_ERROR "package AnnotateLoops was not found")
-  endif()
+  find_package(AnnotateLoops CONFIG REQUIRED)
 
   get_target_property(ANNOTATELOOPS_LIB_LOCATION LLVMAnnotateLoopsPass LOCATION)
+
+  configure_file("${CMAKE_SOURCE_DIR}/scripts/preamble/preamble.sh.in"
+    "preamble/${PIPELINE_NAME}_preamble.sh" @ONLY)
 endmacro()
 
 AnnotateLoopsLEPipelineSetup()
@@ -113,6 +118,7 @@ function(AnnotateLoopsLEPipeline trgt)
     -annotate-loops
     -al-loop-start-id=2
     -al-loop-id-interval=4
+    -al-loop-lines
     -al-stats=${REPORT_FILE}
     ${PIPELINE_CMDLINE_ARG})
   add_dependencies(${PIPELINE_PREFIX}_opt2 ${PIPELINE_PREFIX}_link)
@@ -137,35 +143,28 @@ function(AnnotateLoopsLEPipeline trgt)
 
   # installation
   get_property(bmk_name TARGET ${trgt} PROPERTY BMK_NAME)
+  set(DEST_DIR "${bmk_name}")
 
-  InstallAnnotateLoopsLEPipelineLLVMIR(${PIPELINE_PREFIX}_link ${bmk_name})
-endfunction()
+  install(TARGETS ${PIPELINE_PREFIX}_bc_exe
+    DESTINATION ${DEST_DIR} OPTIONAL)
 
+  set(BMK_BIN_NAME "${PIPELINE_PREFIX}_bc_exe")
+  set(BMK_BIN_PREAMBLE "")
+  set(PIPELINE_SCRIPT_PREFIX "${PIPELINE_NAME}")
 
-function(InstallAnnotateLoopsLEPipelineLLVMIR pipeline_part_trgt bmk_name)
-  AnnotateLoopsLEPipelineSetupNames()
+  configure_file("scripts/_run.sh.in" "scripts/${PIPELINE_PREFIX}_run.sh" @ONLY)
 
+  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/scripts/
+    DESTINATION ${DEST_DIR}
+    PATTERN "*.sh"
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE)
+
+  # IR installation
   if(NOT TARGET ${PIPELINE_INSTALL_TARGET})
     add_custom_target(${PIPELINE_INSTALL_TARGET})
   endif()
 
-  get_property(llvmir_dir TARGET ${pipeline_part_trgt} PROPERTY LLVMIR_DIR)
-
-  # strip trailing slashes
-  string(REGEX REPLACE "(.*[^/]+)(//*)$" "\\1" llvmir_stripped_dir ${llvmir_dir})
-  get_filename_component(llvmir_part_dir ${llvmir_stripped_dir} NAME)
-
-  set(PIPELINE_DEST_SUBDIR
-    ${CMAKE_INSTALL_PREFIX}/CPU2006/${bmk_name}/llvm-ir/${llvmir_part_dir})
-
-  set(PIPELINE_PART_INSTALL_TARGET "${pipeline_part_trgt}-install")
-
-  add_custom_target(${PIPELINE_PART_INSTALL_TARGET}
-    COMMAND ${CMAKE_COMMAND} -E
-    copy_directory ${llvmir_dir} ${PIPELINE_DEST_SUBDIR})
-
-  add_dependencies(${PIPELINE_PART_INSTALL_TARGET} ${pipeline_part_trgt})
-  add_dependencies(${PIPELINE_INSTALL_TARGET} ${PIPELINE_PART_INSTALL_TARGET})
+  InstallPipelineLLVMIR(DEPENDS ${PIPELINE_PREFIX}_link
+    ATTACH_TO_TARGET ${PIPELINE_INSTALL_TARGET} BMK_NAME ${bmk_name})
 endfunction()
-
 

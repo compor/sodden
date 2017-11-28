@@ -11,12 +11,16 @@ macro(PollyWithIdLEPipelineSetup)
   message(STATUS "setting up pipeline ${PIPELINE_NAME}")
 
   if(NOT DEFINED ENV{HARNESS_REPORT_DIR})
-    message(FATAL_ERROR
-      "${PIPELINE_NAME} env variable HARNESS_REPORT_DIR is not defined")
+    message(WARNING
+      "${PIPELINE_NAME} env variable HARNESS_REPORT_DIR is not defined. \
+      Using ${CMAKE_BINARY_DIR}/reports/")
+
+      set(ENV{HARNESS_REPORT_DIR} "${CMAKE_BINARY_DIR}/reports/")
   endif()
 
-  if(NOT IS_DIRECTORY $ENV{HARNESS_REPORT_DIR})
-    message(FATAL_ERROR "${PIPELINE_NAME} HARNESS_REPORT_DIR does not exist")
+  file(TO_CMAKE_PATH $ENV{HARNESS_REPORT_DIR} HARNESS_REPORT_DIR)
+  if(NOT EXISTS ${HARNESS_REPORT_DIR})
+    file(MAKE_DIRECTORY ${HARNESS_REPORT_DIR})
   endif()
 
   message(STATUS
@@ -25,10 +29,6 @@ macro(PollyWithIdLEPipelineSetup)
   #
 
   find_package(LLVMPolly REQUIRED)
-
-  if(NOT LLVMPOLLY_FOUND)
-    message(FATAL_ERROR "${PIPELINE_NAME} package Polly was not found")
-  endif()
 endmacro()
 
 PollyWithIdLEPipelineSetup()
@@ -81,34 +81,28 @@ function(PollyWithIdLEPipeline trgt)
 
   # installation
   get_property(bmk_name TARGET ${trgt} PROPERTY BMK_NAME)
+  set(DEST_DIR "${bmk_name}")
 
-  InstallPollyWithIdLEPipelineLLVMIR(${PIPELINE_PREFIX}_link ${bmk_name})
-endfunction()
+  install(TARGETS ${PIPELINE_PREFIX}_bc_exe
+    DESTINATION ${DEST_DIR} OPTIONAL)
 
+  set(BMK_BIN_NAME "${PIPELINE_PREFIX}_bc_exe")
+  set(BMK_BIN_PREAMBLE "")
+  set(PIPELINE_SCRIPT_PREFIX "${PIPELINE_NAME}")
 
-function(InstallPollyWithIdLEPipelineLLVMIR pipeline_part_trgt bmk_name)
-  PollyWithIdLEPipelineSetupNames()
+  configure_file("scripts/_run.sh.in" "scripts/${PIPELINE_PREFIX}_run.sh" @ONLY)
 
+  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/scripts/
+    DESTINATION ${DEST_DIR}
+    PATTERN "*.sh"
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE)
+
+  # IR installation
   if(NOT TARGET ${PIPELINE_INSTALL_TARGET})
     add_custom_target(${PIPELINE_INSTALL_TARGET})
   endif()
 
-  get_property(llvmir_dir TARGET ${pipeline_part_trgt} PROPERTY LLVMIR_DIR)
-
-  # strip trailing slashes
-  string(REGEX REPLACE "(.*[^/]+)(//*)$" "\\1" llvmir_stripped_dir ${llvmir_dir})
-  get_filename_component(llvmir_part_dir ${llvmir_stripped_dir} NAME)
-
-  set(PIPELINE_DEST_SUBDIR
-    ${CMAKE_INSTALL_PREFIX}/CPU2006/${bmk_name}/llvm-ir/${llvmir_part_dir})
-
-  set(PIPELINE_PART_INSTALL_TARGET "${pipeline_part_trgt}-install")
-
-  add_custom_target(${PIPELINE_PART_INSTALL_TARGET}
-    COMMAND ${CMAKE_COMMAND} -E
-    copy_directory ${llvmir_dir} ${PIPELINE_DEST_SUBDIR})
-
-  add_dependencies(${PIPELINE_PART_INSTALL_TARGET} ${pipeline_part_trgt})
-  add_dependencies(${PIPELINE_INSTALL_TARGET} ${PIPELINE_PART_INSTALL_TARGET})
+  InstallPipelineLLVMIR(DEPENDS ${PIPELINE_PREFIX}_link
+    ATTACH_TO_TARGET ${PIPELINE_INSTALL_TARGET} BMK_NAME ${bmk_name})
 endfunction()
 
