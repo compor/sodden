@@ -23,10 +23,10 @@ ICC_FLAGS="${ICC_FLAGS} -qopt-report-phase=par"
 ICC_FLAGS="${ICC_FLAGS} -qopt-report-file=report.txt"
 
 C_FLAGS="${CMAKE_C_FLAGS} ${ICC_FLAGS}"
+#C_FLAGS="-g -Wall -O3"
+
 CXX_FLAGS="${CMAKE_CXX_FLAGS} ${ICC_FLAGS}"
 
-
-#C_FLAGS="-g -Wall -O3"
 #LINKER_FLAGS="-Wl,-L$(llvm-config --libdir) -Wl,-rpath=$(llvm-config --libdir)"
 #LINKER_FLAGS="${LINKER_FLAGS} -lc++ -lc++abi" 
 
@@ -36,6 +36,7 @@ cmake \
   -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
   -DCMAKE_BUILD_TYPE=Debug \
   -DCMAKE_C_FLAGS="${C_FLAGS}" \
+  -DCMAKE_CXX_FLAGS="${CXX_FLAGS}" \
   -DCMAKE_EXE_LINKER_FLAGS="${LINKER_FLAGS}" \
   -DCMAKE_SHARED_LINKER_FLAGS="${LINKER_FLAGS}" \
   -DCMAKE_MODULE_LINKER_FLAGS="${LINKER_FLAGS}" \
