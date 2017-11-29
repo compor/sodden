@@ -11,31 +11,38 @@ macro(PollyWithIdOptPipelineSetup)
   message(STATUS "setting up pipeline ${PIPELINE_NAME}")
 
   if(NOT DEFINED ENV{HARNESS_INPUT_DIR})
-    message(FATAL_ERROR
-      "${PIPELINE_NAME} env variable HARNESS_INPUT_DIR is not defined")
+    message(WARNING
+      "${PIPELINE_NAME} env variable HARNESS_INPUT_DIR is not defined. \
+      Using ${CMAKE_BINARY_DIR}/inputs/")
+
+      set(ENV{HARNESS_INPUT_DIR} "${CMAKE_BINARY_DIR}/inputs/")
   endif()
 
   if(NOT DEFINED ENV{HARNESS_REPORT_DIR})
-    message(FATAL_ERROR
-      "${PIPELINE_NAME} env variable HARNESS_REPORT_DIR is not defined")
+    message(WARNING
+      "${PIPELINE_NAME} env variable HARNESS_REPORT_DIR is not defined. \
+      Using ${CMAKE_BINARY_DIR}/reports/")
+
+      set(ENV{HARNESS_REPORT_DIR} "${CMAKE_BINARY_DIR}/reports/")
   endif()
 
   if(NOT DEFINED ENV{POLLY_BLACKLIST_FILE})
-    message(FATAL_ERROR
+    message(WARNING
       "${PIPELINE_NAME} env variable POLLY_BLACKLIST_FILE is not defined")
   endif()
 
   file(TO_CMAKE_PATH $ENV{HARNESS_INPUT_DIR} HARNESS_INPUT_DIR)
-  if(NOT IS_DIRECTORY ${HARNESS_INPUT_DIR})
-    message(FATAL_ERROR "${PIPELINE_NAME} HARNESS_INPUT_DIR does not exist")
+  if(NOT EXISTS ${HARNESS_INPUT_DIR})
+    file(MAKE_DIRECTORY ${HARNESS_INPUT_DIR})
   endif()
 
-  if(NOT IS_DIRECTORY $ENV{HARNESS_REPORT_DIR})
-    message(FATAL_ERROR "${PIPELINE_NAME} HARNESS_REPORT_DIR does not exist")
+  file(TO_CMAKE_PATH $ENV{HARNESS_REPORT_DIR} HARNESS_REPORT_DIR)
+  if(NOT EXISTS ${HARNESS_REPORT_DIR})
+    file(MAKE_DIRECTORY ${HARNESS_REPORT_DIR})
   endif()
 
   message(STATUS
-    "${PIPELINE_NAME} uses env variable: HARNESS_INPUT_DIR=${HARNESS_INPUT_DIR}")
+    "${PIPELINE_NAME} uses env variable: HARNESS_INPUT_DIR=$ENV{HARNESS_INPUT_DIR}")
   message(STATUS
     "${PIPELINE_NAME} uses env variable: HARNESS_REPORT_DIR=$ENV{HARNESS_REPORT_DIR}")
   message(STATUS
@@ -43,10 +50,6 @@ macro(PollyWithIdOptPipelineSetup)
   #
 
   find_package(LLVMPolly REQUIRED)
-
-  if(NOT LLVMPOLLY_FOUND)
-    message(FATAL_ERROR "${PIPELINE_NAME} package Polly was not found")
-  endif()
 endmacro()
 
 PollyWithIdOptPipelineSetup()

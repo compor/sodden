@@ -42,9 +42,9 @@ macro(LoopRuntimeProfilerLoopDepthPipelineSetup)
   endif()
 
   message(STATUS
-    "${PIPELINE_NAME} uses env variable: HARNESS_INPUT_DIR=${HARNESS_INPUT_DIR}")
+    "${PIPELINE_NAME} uses env variable: HARNESS_INPUT_DIR=$ENV{HARNESS_INPUT_DIR}")
   message(STATUS
-    "${PIPELINE_NAME} uses env variable: HARNESS_REPORT_DIR=${HARNESS_REPORT_DIR}")
+    "${PIPELINE_NAME} uses env variable: HARNESS_REPORT_DIR=$ENV{HARNESS_REPORT_DIR}")
 
   #
 
@@ -52,8 +52,12 @@ macro(LoopRuntimeProfilerLoopDepthPipelineSetup)
 
   get_target_property(LRP_LIB_LOCATION LLVMLoopRuntimeProfilerPass LOCATION)
 
-  configure_file("${CMAKE_SOURCE_DIR}/scripts/preamble/preamble.sh.in"
-    "preamble/${PIPELINE_NAME}_preamble.sh" @ONLY)
+  set(PREAMBLE_SCRIPT "preamble.sh")
+  set(PREAMBLE_SCRIPT_INPUT "${CMAKE_SOURCE_DIR}/scripts/preamble/${PREAMBLE_SCRIPT}.in")
+
+  if(EXISTS ${PREAMBLE_SCRIPT_INPUT})
+    configure_file(${PREAMBLE_SCRIPT_INPUT} "preamble/${PIPELINE_NAME}_${PREAMBLE_SCRIPT}" @ONLY)
+  endif()
 endmacro()
 
 LoopRuntimeProfilerLoopDepthPipelineSetup()
@@ -107,21 +111,6 @@ function(LoopRuntimeProfilerLoopDepthPipeline trgt)
     ${PIPELINE_PREFIX}_bc_exe)
 
   add_dependencies(${PIPELINE_NAME} ${PIPELINE_SUBTARGET})
-
-
-  # installation
-  get_property(bmk_name TARGET ${trgt} PROPERTY BMK_NAME)
-  set(DEST_DIR "CPU2006/${bmk_name}")
-
-  install(TARGETS ${PIPELINE_PREFIX}_bc_exe
-    DESTINATION ${DEST_DIR} OPTIONAL)
-
-  set(BMK_BIN_NAME "${PIPELINE_PREFIX}_bc_exe")
-
-  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/scripts/
-    DESTINATION ${DEST_DIR}
-    PATTERN "*.sh"
-    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE)
 
 
   # installation

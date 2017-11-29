@@ -54,8 +54,12 @@ macro(AnnotateLoopsPipelineSetup)
 
   get_target_property(ANNOTATELOOPS_LIB_LOCATION LLVMAnnotateLoopsPass LOCATION)
 
-  configure_file("${CMAKE_SOURCE_DIR}/scripts/preamble/preamble.sh.in"
-    "preamble/${PIPELINE_NAME}_preamble.sh" @ONLY)
+  set(PREAMBLE_SCRIPT "preamble.sh")
+  set(PREAMBLE_SCRIPT_INPUT "${CMAKE_SOURCE_DIR}/scripts/preamble/${PREAMBLE_SCRIPT}.in")
+
+  if(EXISTS ${PREAMBLE_SCRIPT_INPUT})
+    configure_file(${PREAMBLE_SCRIPT_INPUT} "preamble/${PIPELINE_NAME}_${PREAMBLE_SCRIPT}" @ONLY)
+  endif()
 endmacro()
 
 AnnotateLoopsPipelineSetup()
