@@ -11,17 +11,31 @@ if(NOT ${hasSrcDir})
   return()
 endif()
 
-set(SOURCES
-  args.c                                       
-  em3d.c
-  main.c
-  make_graph.c
-  util.c)
+set(BMK_LANG "C")
 
+#set(SOURCES
+  #args.c                                       
+  #em3d.c
+  #main.c
+  #make_graph.c
+  #util.c)
+
+file(GLOB CXXSOURCES 
+  RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/${HARNESS_BMK_SOURCE_SUBDIR} 
+  ${HARNESS_BMK_SOURCE_SUBDIR}/*.cpp)
+file(GLOB CSOURCES 
+  RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/${HARNESS_BMK_SOURCE_SUBDIR}
+  ${HARNESS_BMK_SOURCE_SUBDIR}/*.c)
+
+if(CXXSOURCES)
+  set(BMK_LANG "CXX")
+endif()
+
+list(APPEND SOURCES ${CSOURCES} ${CXXSOURCES})
 add_prefix(SOURCES "${HARNESS_BMK_SOURCE_SUBDIR}/" "${SOURCES}")
 
-list(APPEND SOURCES ${COMMON_SOURCES})
-list(APPEND SOURCES ${COMMON_RAND_SOURCES})
+message(STATUS "${BMK_NAME} source language: ${BMK_LANG}")
+set_source_files_properties(${SOURCES} PROPERTIES LANGUAGE ${BMK_LANG})
 
 add_executable(${BMK_PROJECT_NAME} ${SOURCES})
 
@@ -35,7 +49,8 @@ target_link_libraries(${BMK_PROJECT_NAME} m)
 
 
 # this property is required by our parasitic targets
-set_target_properties(${BMK_PROJECT_NAME} PROPERTIES LINKER_LANGUAGE C)
+set_target_properties(${BMK_PROJECT_NAME} PROPERTIES 
+  LINKER_LANGUAGE ${BMK_LANG})
 
 # this property is used internally by our harness 
 # because benchmark names and their main targets have different names
