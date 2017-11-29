@@ -52,6 +52,24 @@ execution duration of sections of code. This facility seems to have been present
 Currently, these macros require a POSIX compliant system, so the specific detection is left to `cmake` with the use of
 the `common/config.h.cmake` generated header. On non-POSIX system the macros have dummy/empty alternatives.
 
+### Source language selection
+
+Typically build tools for `C`/`C++` projects detect the source file language by rules based on the file extension. This
+allows to invoke the corresponding compiler for each source file.
+
+However, the programs of this benchmark suite are not very cleanly written, in terms of separation (and as much as this
+is possible by `C` and `C++`). So, since one the goals is to rejuvenate the source code and convert it to `C++` while
+allowing this to happen independently, the detection of the source language per benchmark happens at the `cmake` level.
+
+Automatic source language detection is set to occur per benchmark program like this:
+
+1. By default the source language is set to `C`.
+2. File globbing is used to gather all `C` (`*.c`) and `C++` (`*.cpp`) source files.
+3. If there is **at least** 1 `C++` file, the source language is changed to `C++`. 
+
+So, in order to use the `C++` compiler for a benchmark, you need to have at least a `C++` source file in its source
+directory.
+
 ### more TODO
 
 
